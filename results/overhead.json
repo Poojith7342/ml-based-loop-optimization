@@ -1,0 +1,6 @@
+{
+  "feature_extraction_ms": 0.688249999711843,
+  "prediction_ms": 1.2682500002938468,
+  "mean_gcc_compile_s": 0.07107216745368813,
+  "selected_model": "k-NN"
+}

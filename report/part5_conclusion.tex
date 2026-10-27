@@ -1,0 +1,38 @@
+% ============================================================
+% PAGE 16 -- CONCLUSION
+% ============================================================
+\section{Conclusion and Future Work}
+
+\subsection{Conclusion}
+
+This report presented an ML-based loop-optimisation decision model built on a compiler
+front end that was implemented from scratch. The lexical analyser, the recursive-descent parser,
+the semantic and loop analyser and the three-address-code generator turn the source of a loop nest into
+\numFeatures\ features (iteration space, memory strides, dependence distance, reductions,
+arithmetic intensity, working set). A supervised model uses these features to select one of
+\numConfigs\ GCC optimisation configurations.
+
+The data set was measured and not simulated: \numKernels\ kernels were compiled with every configuration
+and executed, and configurations that changed the numerical result were rejected. No static
+configuration was best for all loops. With random cross-validation, the best model (\selModel) reached a
+geometric-mean speed-up of \selGMCV\ over \texttt{-O2}, \selFracCV\% of the oracle's gain (\oracleGM). The honest reference is the
+best static choice: always using \texttt{-O3 -march=native -ffast-math} gives \gmOFast\ on this machine, so the model
+is only marginally better in cross-validation and worse (\selGMLOFO) on loop families that were not in the training set.
+Where the binary has to be portable and IEEE-safe, the decision is more valuable: the model reached \pCV\ against \pOThree\ for
+always using \texttt{-O3}, with far fewer slow-downs. Feature extraction and prediction cost less than one compiler invocation.
+
+Overall, the study shows that the early compiler phases provide the information that optimisation decisions need,
+and that a learned decision can replace a fixed heuristic, with two caveats: the training corpus must cover the
+loop patterns that the model will meet, and on a machine where aggressive flags almost always win, a learned model adds
+little over simply using them.
+
+\subsection{Future Work}
+
+Future work will focus on (i) a larger and more diverse corpus, including real benchmark loops (for example from
+PolyBench), to close the gap between random and leave-one-family-out evaluation; (ii) a larger decision space with
+loop-level choices such as tile size, unroll factor and interchange, implemented as source-to-source transformations on the
+AST; (iii) repeating the experiment on several processors and adding machine features to the model; (iv) a more
+robust measurement setup on a dedicated machine with fixed frequency; (v) active learning, in which the model
+requests measurements only for loops it is unsure about; and (vi) integration with LLVM/MLIR passes.
+
+\newpage

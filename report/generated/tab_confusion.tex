@@ -1,0 +1,20 @@
+\begin{table}[H]
+\centering
+\caption{Confusion matrix of the k-NN (5-fold cross validation).}
+\label{tab:confusion}
+\scriptsize
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lrrrrrrr}
+\toprule
+\textbf{True $\backslash$ Pred} & \textbf{O2} & \textbf{O3} & \textbf{O2+unroll4} & \textbf{O2+unroll8} & \textbf{O3+native} & \textbf{O3+unroll+native} & \textbf{O3+fast+native} \\
+\midrule
+\textbf{O2} & 10 & 0 & 0 & 1 & 8 & 4 & 2 \\
+\textbf{O3} & 1 & 2 & 0 & 0 & 2 & 1 & 0 \\
+\textbf{O2+unroll4} & 0 & 0 & 0 & 0 & 0 & 2 & 0 \\
+\textbf{O2+unroll8} & 1 & 0 & 0 & 0 & 1 & 0 & 0 \\
+\textbf{O3+native} & 2 & 1 & 0 & 1 & 45 & 13 & 3 \\
+\textbf{O3+unroll+native} & 5 & 0 & 1 & 0 & 6 & 22 & 3 \\
+\textbf{O3+fast+native} & 0 & 0 & 0 & 0 & 5 & 3 & 37 \\
+\bottomrule
+\end{tabular}}
+\end{table}

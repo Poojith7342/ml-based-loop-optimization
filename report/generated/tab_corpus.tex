@@ -1,0 +1,23 @@
+\begin{table}[H]
+\centering
+\caption{Composition of the loop-kernel corpus.}
+\label{tab:corpus}
+\small
+
+\begin{tabular}{llcrr}
+\toprule
+\textbf{Family} & \textbf{Loop pattern} & \textbf{Depth} & \textbf{Kernels} & \textbf{Footprint (bytes)} \\
+\midrule
+\texttt{axpy} & vector update $y_i=\sum w_jx^{(j)}_i+\dots$ & 1 & 36 & $2^{13}$--$2^{24}$ \\
+\texttt{cond} & loop with data-dependent branch & 1 & 16 & $2^{13}$--$2^{23}$ \\
+\texttt{dot} & dot product / norm (FP reduction) & 1 & 18 & $2^{12}$--$2^{23}$ \\
+\texttt{matmul} & matrix product, loop orders ijk/ikj/jki & 3 & 24 & $2^{14}$--$2^{20}$ \\
+\texttt{recur} & first-order recurrence $a_i=f(a_{i-d})$ & 1 & 24 & $2^{13}$--$2^{23}$ \\
+\texttt{stencil1d} & 3- and 5-point 1-D stencil & 1 & 16 & $2^{13}$--$2^{23}$ \\
+\texttt{stencil2d} & 5-point 2-D Jacobi stencil & 2 & 8 & $2^{15}$--$2^{22}$ \\
+\texttt{strided} & non-unit-stride gather $x[s\,i]$ & 1 & 20 & $2^{15}$--$2^{26}$ \\
+\texttt{traverse2d} & 2-D row/column sums, copy, transpose & 2 & 20 & $2^{17}$--$2^{24}$ \\
+\textbf{Total} &  &  & \textbf{182} &  \\
+\bottomrule
+\end{tabular}
+\end{table}

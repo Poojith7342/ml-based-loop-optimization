@@ -1,0 +1,373 @@
+% ============================================================
+% PAGE 1 -- TITLE PAGE
+% ============================================================
+\begin{titlepage}
+\begin{center}
+
+\vspace*{0.5cm}
+
+\includegraphics[width=3.2cm]{vit-ap-university-logo.png}
+
+\vspace{0.3cm}
+
+{\Large\bfseries
+VIT-AP UNIVERSITY
+}
+
+\vspace{0.3cm}
+
+{\large
+Amaravati, Andhra Pradesh, India
+}
+
+\vspace{0.8cm}
+
+{\Large\bfseries
+COMPILER DESIGN LAB REPORT
+}
+
+\vspace{0.4cm}
+
+{\large
+\textbf{Subject Name: Compiler Design Lab}
+}
+
+\vspace{0.15cm}
+
+{\large
+\textbf{Course Code: CSE3024}
+}
+
+\vspace{1cm}
+
+{\LARGE\bfseries
+Machine Learning-Based Loop Optimization\\
+for High-Performance Compiler Design
+}
+
+\vspace{1.2cm}
+
+\textbf{Submitted by}
+
+\vspace{0.4cm}
+
+\begin{tabular}{ll}
+\textbf{Poojith} & \textbf{Regd. No.:} 24BCB7244 \\[0.4cm]
+\textbf{Student 2 Name} & \textbf{Regd. No.:} 24BCB7161 \\
+\end{tabular}
+
+\vspace{1.2cm}
+
+\textbf{Under the Guidance of}
+
+\vspace{0.3cm}
+
+\textbf{Dr. Prakash Kumar Sarangi}
+
+\vspace{1cm}
+
+{\large
+School of Computer Science and Engineering (SCOPE)\\
+VIT-AP University\\
+Amaravati, Andhra Pradesh, India
+}
+
+\vspace{0.4cm}
+
+{\large
+Academic Year 2026--2027
+}
+
+\end{center}
+\end{titlepage}
+
+% ============================================================
+% PAGE 2 -- ABSTRACT
+% ============================================================
+\input{abstract.tex}
+
+\newpage
+
+% ============================================================
+% PAGE 3-4 -- INTRODUCTION
+% ============================================================
+\section{Introduction}
+
+A compiler is a system software component that translates a program written in
+a source language into an equivalent program in a target language. For
+high-performance computing (HPC) workloads such as dense linear algebra,
+stencil codes, signal processing and scientific simulation, almost all of the
+execution time is spent inside a small number of \emph{loop nests}. The quality
+of the machine code generated for these loops therefore determines the
+performance of the whole application \cite{allen2002,bacon1994}.
+
+Modern optimising compilers contain many loop transformations: loop unrolling,
+loop interchange, loop fusion and fission, tiling, loop-invariant code motion,
+strength reduction and automatic vectorisation \cite{aho2006,cooper2007,muchnick1997}.
+Whether a transformation pays off depends on the loop's trip count, memory
+access pattern, data type, data-dependence structure, working-set size and on
+the target micro-architecture. Production compilers decide with hand-written
+heuristics and fixed cost models that were tuned once, on a set of benchmarks, for
+an average machine. These heuristics are cheap but can be far from the best choice
+for an individual loop, and tuning them by hand is slow and has to be repeated
+for every new processor \cite{wang2018,ashouri2018}.
+
+Machine learning offers an alternative. Instead of writing the heuristic, we
+\emph{learn} it: a number of loops are compiled and timed under different
+optimisation choices, and a model is trained to predict the best choice from
+static features of the loop that the compiler front end can already compute
+\cite{stephenson2003,stephenson2005,fursin2011}. The learned decision model
+replaces the hand-written profitability test of the optimiser.
+
+This report presents a complete, working implementation of this idea for the
+Compiler Design Lab. A small compiler front end (lexical analyser, recursive
+descent parser, semantic and loop analyser, three-address-code generator) is
+written from scratch and used to extract \numFeatures\ numeric features from C
+loop nests. A supervised model then selects one of \numConfigs\ GCC optimisation
+configurations for the loop. The model is trained and evaluated on
+\numKernels\ loop kernels that were actually compiled and executed on the
+target machine.
+
+\subsection{Motivation}
+
+Compiler design is usually taught as a fixed pipeline of phases. The motivation
+of this project is to show that the \emph{outputs} of the early phases (tokens,
+syntax tree, symbol table, intermediate code) are exactly the information that
+an optimisation decision needs, and that the last phase, optimisation, can be
+driven by a data-driven model instead of an ad-hoc rule. A practical
+understanding of this connection links compiler theory with the current
+research direction of ML-guided compilation used in industrial toolchains
+\cite{trofin2021,chen2018}.
+
+The topic is also relevant because HPC users routinely tune compiler flags by
+trial and error: compile with \texttt{-O3}, then with \texttt{-march=native},
+then with unrolling, and measure. A model that predicts a good configuration
+directly from the source of a loop can save this search time.
+
+\subsection{Problem Statement}
+
+Given the source code of a loop nest, the compiler must decide which
+optimisation configuration to apply. This report addresses the following
+problem:
+
+\begin{quote}
+\textit{Given a C loop nest $L$, can a decision model that uses only static
+features computed by a compiler front end predict which of $K$ candidate
+optimisation configurations gives the lowest execution time, so that the
+compiled code is faster than with the default configuration (\texttt{-O2})
+and close to the best possible (oracle) configuration?}
+\end{quote}
+
+Formally, let $C=\{c_1,\dots,c_K\}$ be the configurations and $T(L,c)$ the
+measured execution time of loop $L$ compiled with $c$. We want a function
+$f:\mathbb{R}^{d}\rightarrow C$ on the feature vector $\phi(L)\in\mathbb{R}^{d}$ with
+\begin{equation}
+f(\phi(L)) \approx \arg\min_{c\in C} T(L,c).
+\end{equation}
+
+\subsection{Objectives}
+
+\begin{enumerate}
+    \item To implement the front-end phases of a compiler (lexical, syntax and
+    semantic analysis, intermediate code generation) for a C loop-nest subset.
+
+    \item To perform loop analysis (trip counts, memory strides, loop-carried
+    dependences, reductions) and convert the result into a numeric feature
+    vector.
+
+    \item To build a data set of loop kernels labelled with the best GCC
+    optimisation configuration, obtained by real compilation and timing.
+
+    \item To train and compare ML decision models, and to evaluate them by the
+    speed-up of the generated code and not only by classification accuracy.
+
+    \item To package the result as a command-line tool that advises the
+    compiler flags for a new loop.
+\end{enumerate}
+
+\subsection{Contributions}
+
+The major contributions of this report are as follows:
+
+\begin{itemize}
+    \item \textbf{Compiler front end for loop analysis:}
+    A lexer, recursive-descent parser, semantic analyser and TAC generator for
+    a C loop subset, implemented from scratch in Python
+    (Section~\ref{sec:method}).
+
+    \item \textbf{Loop feature set:}
+    \numFeatures\ static features derived from the AST and TAC, including
+    exact memory strides computed from array declarations and
+    dependence distances computed from affine subscripts.
+
+    \item \textbf{Measured data set:}
+    \numKernels\ kernels in \numFamilies\ families, each compiled with
+    \numConfigs\ configurations and timed with an interleaved, noise-aware
+    protocol (\numCompiles\ compilations).
+
+    \item \textbf{Performance evaluation of the decision model:}
+    Evaluation by realised speed-up with two protocols, random cross-validation
+    and leave-one-family-out, against static and oracle baselines
+    (Section~\ref{sec:results}).
+\end{itemize}
+
+\newpage
+
+% ============================================================
+% PAGE 5-7 -- RELATED WORK
+% ============================================================
+\section{Related Work}
+
+Compiler design has been extensively studied since the development of the
+first automatic programming systems. Aho et al.\ presented comprehensive
+foundations for lexical analysis, parsing, semantic analysis, intermediate
+code generation, optimization, and code generation \cite{aho2006}. Cooper and
+Torczon described optimization techniques and their implementation in modern
+compiler infrastructures \cite{cooper2007}. Appel discussed compiler
+construction and code generation techniques \cite{appel2004}.
+
+\subsection{Traditional Compiler Models}
+
+Traditional compiler architectures use a sequence of analysis and
+synthesis phases. Lexical analysis converts character sequences into tokens.
+Syntax analysis organizes tokens into parse trees. Semantic analysis verifies
+contextual correctness. Intermediate representations are then optimized before
+target-code generation. LR and LL parsing techniques have been extensively used
+for context-free grammars; the front end in this report uses a recursive-descent
+(LL) parser with precedence climbing for expressions.
+
+\subsection{Compiler Optimization and Loop Transformations}
+
+Optimization attempts to improve program performance while preserving
+program semantics. Classical techniques include constant folding, constant
+propagation, common subexpression elimination, dead-code elimination, loop
+optimization, strength reduction, and control-flow optimization
+\cite{muchnick1997}. For loops, the central transformations are
+\emph{unrolling} (replicating the body to reduce loop overhead and expose
+instruction-level parallelism), \emph{interchange} and \emph{tiling}
+(re-ordering iterations to improve cache locality \cite{wolf1991}) and
+\emph{vectorisation} (executing several iterations with one SIMD instruction).
+Their legality is decided by data-dependence analysis, which computes
+dependence distances between array references \cite{allen2002,bacon1994}.
+Polyhedral frameworks automate the search of legal loop transformations
+\cite{bondhugula2008}.
+
+Machine-independent optimisation operates on intermediate representations
+without depending on a particular processor architecture. Machine-dependent
+optimisation considers target-specific characteristics such as registers,
+instruction sets (e.g.\ AVX2/AVX-512), cache behaviour and pipeline constraints.
+
+\subsection{Machine Learning in Compiler Optimization}
+
+Wang and O'Boyle survey the use of machine learning in compilers and conclude that
+learning replaces hand-built heuristics for decisions such as unroll factors,
+inlining, phase ordering and device mapping \cite{wang2018}; Ashouri et al.\ survey
+compiler auto-tuning \cite{ashouri2018}. Stephenson and Amarasinghe used supervised
+classification to predict loop unroll factors from loop features
+\cite{stephenson2005}, and Stephenson et al.\ evolved compiler heuristics with
+genetic programming \cite{stephenson2003}. Agakov et al.\ used learned models to
+focus iterative optimisation on promising transformations \cite{agakov2006}, and
+Milepost GCC integrated feature extraction and machine learning into GCC itself
+\cite{fursin2011}. Cummins et al.\ learned optimisation heuristics directly from
+source text with deep networks \cite{cummins2017}. MLGO brings
+learned policies into LLVM \cite{trofin2021}, and TVM uses a learned cost model
+to tune tensor kernels \cite{chen2018}.
+
+Most of this work either modifies the compiler internals or needs large benchmark suites. The approach in
+this report is deliberately lightweight: the decision model sits \emph{in front of}
+an unmodified compiler (GCC) and chooses among its existing flag sets, which makes it
+easy to reproduce in a laboratory setting.
+
+\subsection{Compiler Technology for Machine Learning}
+
+Machine learning frameworks generate computational graphs containing
+operations such as matrix multiplication, convolution and activation functions.
+Compiler-based approaches such as XLA and MLIR optimise these graphs before
+execution \cite{abadi2016,lattner2021}. This is the opposite direction of the
+present work (compilers \emph{for} ML versus ML \emph{in} compilers), but both
+rely on the same intermediate-representation and loop-optimisation machinery.
+
+\subsection{Survey of Related Approaches}
+
+\begin{table}[H]
+\centering
+\caption{Survey of Compiler Optimisation Decision Approaches}
+\label{tab:survey}
+\small
+\begin{tabularx}{\textwidth}{p{2.6cm}p{2.5cm}X p{2.9cm}}
+\toprule
+\textbf{Approach} & \textbf{Decision} & \textbf{Major Contribution} &
+\textbf{Limitation}\\
+\midrule
+
+GCC / LLVM \texttt{-O} levels
+& All passes
+& Mature, fixed heuristics and cost models
+& Tuned for an average program and machine\\
+
+Polyhedral (Pluto)
+& Loop tiling, parallelism
+& Automatic legal transformation search for affine loops
+& Restricted to affine loop nests\\
+
+Unroll-factor prediction \cite{stephenson2005}
+& Unroll factor
+& Supervised classification from loop features
+& Single transformation, internal compiler change\\
+
+Iterative compilation + ML \cite{agakov2006}
+& Transformation sequence
+& Models focus the search on good sequences
+& Needs many compile-run cycles\\
+
+Milepost GCC \cite{fursin2011}
+& Flags / passes
+& Static features and learning inside GCC
+& Large infrastructure\\
+
+DeepTune \cite{cummins2017}
+& Device mapping, coarsening
+& Learns features from raw source
+& Needs large training sets\\
+
+MLGO \cite{trofin2021}
+& Inlining, register allocation
+& Learned policies in production LLVM
+& Tied to the compiler version\\
+
+\textbf{This work}
+& Flag configuration of loops
+& Own front end + features + model in front of unmodified GCC
+& Small corpus, one machine\\
+
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Limitations of Existing Approaches}
+
+Although learned and heuristic optimisers provide significant performance
+benefits, several limitations remain:
+
+\begin{enumerate}
+    \item Hand-written heuristics are tuned for an average machine and do not
+    adapt to the loop or to the processor.
+    \item Machine-specific optimisations (e.g.\ \texttt{-march=native}) reduce
+    portability of the generated binary.
+    \item Some transformations change floating-point results
+    (e.g.\ \texttt{-ffast-math}), so a decision model must be checked for
+    numerical safety.
+    \item Learned models can mis-predict on loop patterns that were absent from
+    the training data; this must be tested explicitly.
+    \item Timing labels are noisy on shared machines, so labelling has to be
+    robust to measurement noise.
+    \item Optimisation increases compilation effort, and the decision model
+    itself must be cheap compared with compilation.
+\end{enumerate}
+
+The proposed methodology addresses items 3--6 explicitly: it rejects
+configurations that change the numerical result, labels with a noise
+tolerance, evaluates on unseen loop families, and measures the overhead of
+the model.
+
+\newpage

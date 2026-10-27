@@ -1,0 +1,165 @@
+\relax 
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand\HyField@AuxAddToFields[1]{}
+\providecommand\HyField@AuxAddToCoFields[2]{}
+\citation{allen2002}
+\citation{bacon1994}
+\citation{aho2006}
+\citation{cooper2007}
+\citation{muchnick1997}
+\citation{wang2018}
+\citation{ashouri2018}
+\citation{stephenson2003}
+\citation{stephenson2005}
+\citation{fursin2011}
+\citation{trofin2021}
+\citation{chen2018}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{2}{section.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.1}Motivation}{2}{subsection.1.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.2}Problem Statement}{3}{subsection.1.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.3}Objectives}{3}{subsection.1.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.4}Contributions}{3}{subsection.1.4}\protected@file@percent }
+\citation{aho2006}
+\citation{cooper2007}
+\citation{appel2004}
+\citation{muchnick1997}
+\citation{wolf1991}
+\citation{allen2002}
+\citation{bacon1994}
+\citation{bondhugula2008}
+\citation{wang2018}
+\citation{ashouri2018}
+\citation{stephenson2005}
+\citation{stephenson2003}
+\citation{agakov2006}
+\citation{fursin2011}
+\citation{cummins2017}
+\citation{trofin2021}
+\citation{chen2018}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Related Work}{5}{section.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Traditional Compiler Models}{5}{subsection.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Compiler Optimization and Loop Transformations}{5}{subsection.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Machine Learning in Compiler Optimization}{5}{subsection.2.3}\protected@file@percent }
+\citation{abadi2016}
+\citation{lattner2021}
+\citation{stephenson2005}
+\citation{agakov2006}
+\citation{fursin2011}
+\citation{cummins2017}
+\citation{trofin2021}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.4}Compiler Technology for Machine Learning}{6}{subsection.2.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.5}Survey of Related Approaches}{7}{subsection.2.5}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Survey of Compiler Optimisation Decision Approaches}}{7}{table.caption.1}\protected@file@percent }
+\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
+\newlabel{tab:survey}{{1}{7}{Survey of Compiler Optimisation Decision Approaches}{table.caption.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.6}Limitations of Existing Approaches}{7}{subsection.2.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3}Proposed Methodology}{9}{section.3}\protected@file@percent }
+\newlabel{sec:method}{{3}{9}{Proposed Methodology}{section.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Proposed Workflow}{9}{subsection.3.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Proposed Flow Diagram}{9}{subsection.3.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Proposed workflow: compiler front end, feature extraction and ML-based optimisation decision.}}{9}{figure.caption.2}\protected@file@percent }
+\newlabel{fig:workflow}{{1}{9}{Proposed workflow: compiler front end, feature extraction and ML-based optimisation decision}{figure.caption.2}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Offline phase: construction of the labelled data set and training.}}{10}{figure.caption.3}\protected@file@percent }
+\newlabel{fig:offline}{{2}{10}{Offline phase: construction of the labelled data set and training}{figure.caption.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Lexical Analysis}{10}{subsection.3.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4}Syntax Analysis}{10}{subsection.3.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.5}Semantic and Loop Analysis}{10}{subsection.3.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Trip counts.}{11}{subsection.3.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Affine subscripts and strides.}{11}{subsection.3.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Loop-carried dependences.}{11}{equation.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Reductions.}{11}{equation.3.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.6}Intermediate Representation}{11}{subsection.3.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.7}Feature Vector}{12}{subsection.3.7}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Static loop features used by the decision model.}}{12}{table.caption.4}\protected@file@percent }
+\newlabel{tab:features}{{2}{12}{Static loop features used by the decision model}{table.caption.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.8}Decision Space}{12}{subsection.3.8}\protected@file@percent }
+\citation{pedregosa2011}
+\citation{breiman2001}
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Decision space: the seven candidate optimisation configurations.}}{13}{table.caption.5}\protected@file@percent }
+\newlabel{tab:configs}{{3}{13}{Decision space: the seven candidate optimisation configurations}{table.caption.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.9}Labelling Rule}{13}{subsection.3.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.10}Decision Models}{13}{subsection.3.10}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.11}Proposed Algorithm}{14}{subsection.3.11}\protected@file@percent }
+\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces ML-Based Loop Optimisation Decision}}{14}{algorithm.1}\protected@file@percent }
+\newlabel{alg:compiler}{{1}{14}{ML-Based Loop Optimisation Decision}{algorithm.1}{}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {2}{\ignorespaces Construction of the Training Set and Model}}{14}{algorithm.2}\protected@file@percent }
+\newlabel{alg:training}{{2}{14}{Construction of the Training Set and Model}{algorithm.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.12}Implementation}{14}{subsection.3.12}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Source files of the implementation.}}{15}{table.caption.6}\protected@file@percent }
+\newlabel{tab:files}{{4}{15}{Source files of the implementation}{table.caption.6}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Results and Discussion}{16}{section.4}\protected@file@percent }
+\newlabel{sec:results}{{4}{16}{Results and Discussion}{section.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Dataset Preparation}{16}{subsection.4.1}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces Composition of the loop-kernel corpus.}}{16}{table.caption.7}\protected@file@percent }
+\newlabel{tab:corpus}{{5}{16}{Composition of the loop-kernel corpus}{table.caption.7}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}System Requirements}{16}{subsection.4.2}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces System used for the experiments.}}{16}{table.caption.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Evaluation Process}{17}{subsection.4.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.3.1}Execution Time and Speed-up}{17}{subsubsection.4.3.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.3.2}Oracle Gain}{17}{subsubsection.4.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.3.3}Regret}{17}{subsubsection.4.3.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.3.4}Classification Metrics}{17}{subsubsection.4.3.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.3.5}Validation Protocols}{17}{subsubsection.4.3.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.4}Measurement Noise}{17}{subsection.4.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.5}Labels and Static Configurations}{18}{subsection.4.5}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {7}{\ignorespaces Label distribution and performance of each \emph  {static} configuration over all kernels (speed-up w.r.t.\ \texttt  {O2}; a configuration that changes the numerical result is replaced by \texttt  {O2}).}}{18}{table.caption.9}\protected@file@percent }
+\newlabel{tab:labels}{{7}{18}{Label distribution and performance of each \emph {static} configuration over all kernels (speed-up w.r.t.\ \texttt {O2}; a configuration that changes the numerical result is replaced by \texttt {O2})}{table.caption.9}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Best achievable speed-up over \texttt  {O2} for each kernel (oracle).}}{18}{figure.caption.10}\protected@file@percent }
+\newlabel{fig:oracle}{{3}{18}{Best achievable speed-up over \texttt {O2} for each kernel (oracle)}{figure.caption.10}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.6}Performance of the Decision Models}{19}{subsection.4.6}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {8}{\ignorespaces Comparison of decision models and static baselines. GM = geometric mean over kernels; ``Oracle gain'' is the share of the oracle's log-speed-up that is realised; ``Slow-downs'' counts kernels more than 5\% slower than \texttt  {O2}.}}{19}{table.caption.11}\protected@file@percent }
+\newlabel{tab:models}{{8}{19}{Comparison of decision models and static baselines. GM = geometric mean over kernels; ``Oracle gain'' is the share of the oracle's log-speed-up that is realised; ``Slow-downs'' counts kernels more than 5\% slower than \texttt {O2}}{table.caption.11}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Geometric-mean speed-up over \texttt  {O2} of the static configurations, the decision models (5-fold CV) and the oracle.}}{20}{figure.caption.12}\protected@file@percent }
+\newlabel{fig:speedup}{{4}{20}{Geometric-mean speed-up over \texttt {O2} of the static configurations, the decision models (5-fold CV) and the oracle}{figure.caption.12}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.7}Portable Setting}{20}{subsection.4.7}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {9}{\ignorespaces Portable setting: only the four IEEE-safe, non-native configurations (\texttt  {O2}, \texttt  {O3}, \texttt  {O2\_unroll4}, \texttt  {O2\_unroll8}) are allowed.}}{20}{table.caption.13}\protected@file@percent }
+\newlabel{tab:portable}{{9}{20}{Portable setting: only the four IEEE-safe, non-native configurations (\texttt {O2}, \texttt {O3}, \texttt {O2\_unroll4}, \texttt {O2\_unroll8}) are allowed}{table.caption.13}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.8}Per-Family Analysis}{21}{subsection.4.8}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {10}{\ignorespaces Per-family geometric-mean speed-up over \texttt  {O2} of the selected model (k-NN).}}{21}{table.caption.14}\protected@file@percent }
+\newlabel{tab:family}{{10}{21}{Per-family geometric-mean speed-up over \texttt {O2} of the selected model (k-NN)}{table.caption.14}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Per-family speed-up over \texttt  {O2} for the k-NN: oracle, random-split cross validation, and leave-one-family-out.}}{21}{figure.caption.15}\protected@file@percent }
+\newlabel{fig:family}{{5}{21}{Per-family speed-up over \texttt {O2} for the k-NN: oracle, random-split cross validation, and leave-one-family-out}{figure.caption.15}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.9}Confusion Matrix and Feature Importance}{22}{subsection.4.9}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {11}{\ignorespaces Confusion matrix of the k-NN (5-fold cross validation).}}{22}{table.caption.16}\protected@file@percent }
+\newlabel{tab:confusion}{{11}{22}{Confusion matrix of the k-NN (5-fold cross validation)}{table.caption.16}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Ten most important loop features.}}{22}{figure.caption.17}\protected@file@percent }
+\newlabel{fig:importance}{{6}{22}{Ten most important loop features}{figure.caption.17}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.10}Interpretable Rules}{23}{subsection.4.10}\protected@file@percent }
+\@writefile{lol}{\contentsline {lstlisting}{generated/decision\textunderscore tree\textunderscore rules.txt}{23}{lstlisting.-1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.11}Overhead of the Model}{23}{subsection.4.11}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.12}Sample Compiler Program}{23}{subsection.4.12}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.13}Lexical Analysis Output}{24}{subsection.4.13}\protected@file@percent }
+\@writefile{lol}{\contentsline {lstlisting}{generated/tokens.txt}{24}{lstlisting.-3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.14}Three Address Code}{24}{subsection.4.14}\protected@file@percent }
+\@writefile{lol}{\contentsline {lstlisting}{generated/tac.txt}{24}{lstlisting.-4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.15}Advisor Output}{25}{subsection.4.15}\protected@file@percent }
+\@writefile{lol}{\contentsline {lstlisting}{generated/predict\textunderscore output.txt}{25}{lstlisting.-5}\protected@file@percent }
+\@writefile{lol}{\contentsline {lstlisting}{generated/predict\textunderscore output.txt}{25}{lstlisting.-6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.16}Limitations and Threats to Validity}{25}{subsection.4.16}\protected@file@percent }
+\newlabel{sec:limits}{{4.16}{25}{Limitations and Threats to Validity}{subsection.4.16}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Conclusion and Future Work}{27}{section.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Conclusion}{27}{subsection.5.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Future Work}{27}{subsection.5.2}\protected@file@percent }
+\bibcite{aho2006}{1}
+\bibcite{cooper2007}{2}
+\bibcite{appel2004}{3}
+\bibcite{muchnick1997}{4}
+\bibcite{allen2002}{5}
+\bibcite{bacon1994}{6}
+\bibcite{wolf1991}{7}
+\bibcite{bondhugula2008}{8}
+\bibcite{wang2018}{9}
+\bibcite{ashouri2018}{10}
+\bibcite{stephenson2003}{11}
+\bibcite{stephenson2005}{12}
+\bibcite{agakov2006}{13}
+\bibcite{fursin2011}{14}
+\bibcite{cummins2017}{15}
+\bibcite{trofin2021}{16}
+\bibcite{chen2018}{17}
+\bibcite{lattner2021}{18}
+\bibcite{abadi2016}{19}
+\bibcite{pedregosa2011}{20}
+\bibcite{breiman2001}{21}
+\bibcite{gcc}{22}
+\gdef \@abspage@last{30}

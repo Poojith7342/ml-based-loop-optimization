@@ -1,0 +1,25 @@
+i = 0
+L1:
+t1 = i >= N
+if t1 goto L2
+t2 = x[i]
+t3 = t2 > 0.5
+ifFalse t3 goto L3
+t4 = x[i]
+t5 = 0.5 * t4
+t6 = t5 + 0.1
+t7 = x[i]
+t8 = t6 * t7
+t9 = t8 + 0.2
+y[i] = t9
+goto L4
+L3:
+t10 = x[i]
+t11 = 0.25 * t10
+y[i] = t11
+L4:
+i = i + 1
+goto L1
+L2:
+t12 = y[0]
+return t12

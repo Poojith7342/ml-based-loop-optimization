@@ -1,0 +1,27 @@
+\begin{table}[H]
+\centering
+\caption{Comparison of decision models and static baselines. GM = geometric mean over kernels; ``Oracle gain'' is the share of the oracle's log-speed-up that is realised; ``Slow-downs'' counts kernels more than 5\% slower than \texttt{O2}.}
+\label{tab:models}
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llrrrrrr}
+\toprule
+\textbf{Model} & \textbf{Protocol} & \textbf{Acc.\ (\%)} & \textbf{Macro-F1} & \textbf{GM speed-up} & \textbf{Oracle gain (\%)} & \textbf{Regret (\%)} & \textbf{Slow-downs} \\
+\midrule
+Always -O2 & -- & 13.7 & 0.03 & 1.000 & 0 & 245.5 & 0 \\
+Always -O3 & -- & 3.3 & 0.01 & 1.054 & 6 & 232.1 & 32 \\
+Always -O3 -march=native & -- & 35.7 & 0.08 & 1.512 & 49 & 170.9 & 17 \\
+Always -O3 -march=native -ffast-math & -- & 24.7 & 0.06 & 2.197 & 94 & 6.0 & 6 \\
+Majority class & 5-fold CV & 35.7 $\pm$ 0.0 & 0.08 & 1.512 & 49 & 170.9 & 17 \\
+Majority class & LOFO & 24.7 & 0.07 & 1.513 & 49 & 170.8 & 16 \\
+Decision Tree & 5-fold CV & 60.7 $\pm$ 2.9 & 0.34 & 2.130 & 90 & 16.2 & 6 \\
+Decision Tree & LOFO & 41.2 & 0.22 & 1.706 & 64 & 79.8 & 13 \\
+Random Forest & 5-fold CV & 63.4 $\pm$ 1.0 & 0.38 & 2.221 & 95 & 4.9 & 6 \\
+Random Forest & LOFO & 41.2 & 0.22 & 1.714 & 64 & 78.0 & 14 \\
+Gradient Boosting & 5-fold CV & 60.2 $\pm$ 1.1 & 0.37 & 2.175 & 92 & 12.9 & 5 \\
+Gradient Boosting & LOFO & 32.4 & 0.19 & 1.650 & 60 & 96.4 & 15 \\
+k-NN & 5-fold CV & 66.5 $\pm$ 1.5 & 0.41 & 2.221 & 95 & 5.0 & 6 \\
+k-NN & LOFO & 48.4 & 0.27 & 1.794 & 70 & 64.7 & 12 \\
+\bottomrule
+\end{tabular}}
+\end{table}

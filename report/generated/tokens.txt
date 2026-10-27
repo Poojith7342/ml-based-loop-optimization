@@ -1,0 +1,8 @@
+KEYWORD:for        PUNCT:(            TYPE:int           IDENT:i
+OP:=               NUMBER:0           PUNCT:;            IDENT:i
+OP:<               IDENT:N            PUNCT:;            IDENT:i
+OP:++              PUNCT:)            PUNCT:{            KEYWORD:if
+PUNCT:(            IDENT:x            PUNCT:[            IDENT:i
+PUNCT:]            OP:>               NUMBER:0.5         PUNCT:)
+PUNCT:{            IDENT:y            PUNCT:[            IDENT:i
+...

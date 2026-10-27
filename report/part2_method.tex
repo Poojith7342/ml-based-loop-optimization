@@ -1,0 +1,336 @@
+% ============================================================
+% PAGE 8-11 -- PROPOSED METHOD
+% ============================================================
+\section{Proposed Methodology}
+\label{sec:method}
+
+This work proposes a compiler-oriented framework in which the analysis phases
+of a compiler feed a machine-learning model that makes the optimisation
+decision. The framework has an \emph{offline} part (building the training
+data) and an \emph{online} part (advising a new loop).
+
+\subsection{Proposed Workflow}
+
+The overall workflow consists of:
+
+\begin{enumerate}
+    \item Source/Input acquisition (a C function \texttt{kernel} with a loop nest).
+    \item Lexical analysis (tokens).
+    \item Syntax analysis (abstract syntax tree).
+    \item Semantic analysis (symbol table, trip counts, strides, dependences).
+    \item Intermediate representation generation (three-address code).
+    \item Feature-vector construction.
+    \item ML decision model $\rightarrow$ optimisation configuration.
+    \item Target-code generation by GCC with the selected flags.
+    \item Execution and performance evaluation.
+\end{enumerate}
+
+\subsection{Proposed Flow Diagram}
+
+\begin{figure}[H]
+\centering
+
+\begin{tikzpicture}[
+node distance=0.65cm and 0.8cm,
+box/.style={
+rectangle,
+rounded corners,
+draw,
+minimum width=2.7cm,
+minimum height=0.85cm,
+align=center,
+font=\small
+},
+arrow/.style={-{Stealth},thick}
+]
+
+\node[box] (src) {C loop kernel};
+\node[box,right=of src] (lex) {Lexical\\analysis};
+\node[box,right=of lex] (syn) {Syntax analysis\\(AST)};
+\node[box,below=of syn] (sem) {Semantic and\\loop analysis};
+\node[box,left=of sem] (ir) {Intermediate code\\(TAC)};
+\node[box,left=of ir] (feat) {Feature\\vector};
+\node[box,below=of feat] (ml) {ML decision\\model};
+\node[box,right=of ml] (flags) {GCC flag\\selection};
+\node[box,right=of flags] (exe) {Optimised\\executable};
+
+\draw[arrow] (src) -- (lex);
+\draw[arrow] (lex) -- (syn);
+\draw[arrow] (syn) -- (sem);
+\draw[arrow] (sem) -- (ir);
+\draw[arrow] (ir) -- (feat);
+\draw[arrow] (feat) -- (ml);
+\draw[arrow] (ml) -- (flags);
+\draw[arrow] (flags) -- (exe);
+
+\end{tikzpicture}
+
+\caption{Proposed workflow: compiler front end, feature extraction and ML-based optimisation decision.}
+\label{fig:workflow}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+node distance=0.65cm and 0.8cm,
+box/.style={rectangle,rounded corners,draw,minimum width=2.7cm,minimum height=0.85cm,align=center,font=\small},
+arrow/.style={-{Stealth},thick}
+]
+\node[box] (gen) {Kernel generator\\(\numFamilies\ families)};
+\node[box,right=of gen] (comp) {Compile with all\\\numConfigs\ configurations};
+\node[box,right=of comp] (time) {Execute and time\\(5 interleaved rounds)};
+\node[box,below=of time] (lab) {Safety filter and\\labelling};
+\node[box,left=of lab] (fe) {Front end:\\feature extraction};
+\node[box,left=of fe] (train) {Train and\\cross-validate};
+\draw[arrow] (gen) -- (comp);
+\draw[arrow] (comp) -- (time);
+\draw[arrow] (time) -- (lab);
+\draw[arrow] (lab) -- (fe);
+\draw[arrow] (fe) -- (train);
+\end{tikzpicture}
+\caption{Offline phase: construction of the labelled data set and training.}
+\label{fig:offline}
+\end{figure}
+
+\subsection{Lexical Analysis}
+
+Lexical analysis converts a sequence of characters into tokens. The scanner
+(\texttt{lexer.py}) is specified by regular expressions in the same way as a
+Lex/Flex description, with token classes \texttt{KEYWORD}, \texttt{TYPE},
+\texttt{IDENT}, \texttt{NUMBER}, \texttt{OP}, \texttt{PUNCT}; comments,
+white space and pre-processor lines are discarded and an illegal character is
+reported as a lexical error. For example, the statement
+
+\begin{verbatim}
+C[i][j] += A[i][k]*B[k][j];
+\end{verbatim}
+
+is converted into the token sequence (as printed by the implemented scanner):
+
+\begin{verbatim}
+IDENT C | [ i ] [ j ] | OP += | IDENT A | [ i ] [ k ] |
+OP * | IDENT B | [ k ] [ j ] | ;
+\end{verbatim}
+
+\subsection{Syntax Analysis}
+
+Syntax analysis determines whether the token sequence conforms to the grammar
+of the language. The output is an Abstract Syntax Tree (AST). The parser
+(\texttt{loop\_parser.py}) is a recursive-descent (LL(1)) parser; expressions are
+parsed by precedence climbing, which corresponds to the usual left-recursion-free
+expression grammar:
+
+\begin{align*}
+E &\rightarrow T\,(\,(+\,|\,-)\,T\,)^{*} &
+T &\rightarrow F\,(\,(*\,|\,/)\,F\,)^{*} \\
+F &\rightarrow \mathit{NUM}\;|\;\mathit{ID}\,[\,E\,]^{*}\;|\;(\,E\,)\;|\;-F &
+S &\rightarrow \texttt{for}\;(\dots)\;S\;|\;\texttt{if}\;(E)\;S\;[\texttt{else}\;S]\;|\;L\;\mathit{op}\;E\,;
+\end{align*}
+
+where $\mathit{op}\in\{=,+\!=,-\!=,*\!=,/\!=\}$ and $L$ is a scalar or an array element.
+The AST nodes are \texttt{For}, \texttt{If}, \texttt{Assign}, \texttt{BinOp},
+\texttt{UnOp}, \texttt{Index}, \texttt{Var}, \texttt{Num} and \texttt{Call}.
+Syntax errors are reported with the offending token and line.
+
+\subsection{Semantic and Loop Analysis}
+
+Semantic analysis checks contextual constraints: every array is declared and used
+with the declared number of subscripts, every identifier is declared, and loop
+bounds are constant expressions that can be evaluated from the \texttt{\#define}
+constants (a simple symbol table). On the checked AST, the analyser computes the
+information that drives the optimisation decision.
+
+\paragraph{Trip counts.} For \texttt{for (i = lo; i < hi; i += s)}, the trip count is
+$\lceil (hi-lo)/s\rceil$; the iteration space of a nest is the product of the trip counts.
+
+\paragraph{Affine subscripts and strides.} Each subscript is evaluated as an
+affine function $a\,v+b$ of the innermost loop variable $v$ (the function is
+checked to be linear by evaluating it at three points). For an array with
+dimensions $S_0,\dots,S_{n-1}$ and subscripts $e_0,\dots,e_{n-1}$ with
+coefficients $a_k$ in $v$, the memory stride of the reference (in elements) is
+\begin{equation}
+\mathrm{stride}_v = \sum_{k=0}^{n-1} a_k \prod_{m>k} S_m .
+\end{equation}
+A stride of 1 is a unit-stride (vectorisable, cache-friendly) access, a stride of 0 is
+loop-invariant, and a large stride (e.g.\ $S_1=M$ when the \emph{row} index is the inner loop
+variable) is a cache-hostile access that loop interchange could repair.
+
+\paragraph{Loop-carried dependences.} For a write $W$ and a read $R$ of the same
+array with equal coefficients $a$ and offsets $b_W$, $b_R$ in the innermost
+variable, the dependence distance is
+\begin{equation}
+d = \frac{b_W - b_R}{a}.
+\end{equation}
+If $d>0$ the read uses a value written $d$ iterations earlier (a flow dependence of
+distance $d$) and the loop cannot be vectorised with a vector length larger than $d$.
+
+\paragraph{Reductions.} A scalar (or an array element that is invariant in the inner loop)
+updated with \texttt{+=}, \texttt{*=} or \texttt{x = x + \dots} is a reduction. Floating-point
+reductions can only be vectorised if the compiler may re-associate the additions,
+which is not allowed under strict IEEE semantics.
+
+\subsection{Intermediate Representation}
+
+The AST of the loop body is lowered to three-address code (\texttt{tac.py}). Each
+instruction has at most one operator; simple affine subscripts remain inline.
+Three-address code for the body of the matrix-multiplication loop
+\texttt{C[i][j] += A[i][k]*B[k][j]} is:
+
+\begin{align}
+t_1 &= C[i][j]\\
+t_2 &= A[i][k]\\
+t_3 &= B[k][j]\\
+t_4 &= t_2 * t_3\\
+t_5 &= t_1 + t_4\\
+C[i][j] &= t_5
+\end{align}
+
+The number of TAC instructions of the innermost body is used as a feature
+(\texttt{tac\_len}) and the TAC of the complete loop nest, including labels and
+conditional jumps, can be printed by the tool (Section~\ref{sec:results}).
+
+\subsection{Feature Vector}
+
+The analyser produces the \numFeatures\ features of Table~\ref{tab:features}. They
+describe the size of the iteration space, the arithmetic and memory work of the body,
+the access pattern, the dependence structure and the working set.
+
+\begin{table}[H]
+\centering
+\caption{Static loop features used by the decision model.}
+\label{tab:features}
+\footnotesize
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Feature} & \textbf{Meaning}\\
+\midrule
+\texttt{dtype\_bytes} & Size of the data type (4 = float, 8 = double)\\
+\texttt{nest\_depth} & Depth of the loop nest\\
+\texttt{inner\_trip\_log2}, \texttt{total\_iters\_log2} & $\log_2$ of the innermost trip count and of the total iterations\\
+\texttt{n\_add}, \texttt{n\_mul}, \texttt{n\_div}, \texttt{n\_flops} & Floating-point operations per innermost iteration (address arithmetic excluded)\\
+\texttt{n\_loads}, \texttt{n\_stores}, \texttt{n\_arrays} & Distinct array loads, stores and arrays per iteration\\
+\texttt{n\_branches} & Number of \texttt{if} statements in the body\\
+\texttt{n\_unit\_stride}, \texttt{n\_nonunit\_stride}, \texttt{n\_invariant} & Number of references with stride 1, stride $\neq$ 0,1 and stride 0\\
+\texttt{max\_stride\_log2} & $\log_2$ of the largest absolute stride\\
+\texttt{has\_reduction} & 1 if the body contains a reduction\\
+\texttt{has\_carried\_dep}, \texttt{dep\_distance} & 1 if a loop-carried flow dependence exists, and its distance\\
+\texttt{footprint\_log2} & $\log_2$ of the total size in bytes of the arrays touched\\
+\texttt{bytes\_per\_iter}, \texttt{arith\_intensity} & Bytes moved per iteration and flops per byte\\
+\texttt{tac\_len} & Number of TAC instructions in the loop body\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Decision Space}
+
+The model chooses one of the \numConfigs\ GCC configurations of Table~\ref{tab:configs}.
+They are ordered from conservative to aggressive: \texttt{O2} is the default baseline,
+the \texttt{native} variants use the instruction set of the build machine (less portable),
+and \texttt{O3\_fast\_native} additionally allows floating-point re-association
+(\texttt{-ffast-math}), which changes numerical results.
+
+\input{generated/tab_configs.tex}
+
+\subsection{Labelling Rule}
+
+Every kernel is compiled and executed with all configurations. Let $T_c$ be the
+measured time of configuration $c$ and $r_c$ the checksum of the program output. A
+configuration is \emph{admissible} if its result agrees with the baseline:
+\begin{equation}
+\frac{|r_c-r_{O2}|}{|r_{O2}|} \le 10^{-3}.
+\end{equation}
+The label is the most conservative admissible configuration whose time is within
+$\tau=5\%$ of the fastest admissible one:
+\begin{equation}
+y = \min_{\text{order}}\{\,c \;:\; c\ \text{admissible},\ T_c \le (1+\tau)\min_{c'\ \text{adm.}} T_{c'}\,\}.
+\end{equation}
+The tolerance $\tau$ keeps the label stable under measurement noise
+(Section~\ref{sec:results}), and the conservative ordering prefers portable, numerically safe
+flags whenever a more aggressive flag brings no real gain.
+
+\subsection{Decision Models}
+
+Four supervised classifiers from scikit-learn \cite{pedregosa2011} are compared: a depth-limited
+\emph{Decision Tree} (interpretable, depth 5), a \emph{Random Forest} \cite{breiman2001} with
+300 trees, \emph{Gradient Boosting} (100 trees of depth 3) and \emph{k-NN} on standardised features
+($k=5$, distance weighting). They are compared with four baselines that do not use the features:
+always \texttt{O2}, always \texttt{O3}, always \texttt{O3\_native} and the majority class.
+
+\subsection{Proposed Algorithm}
+
+\begin{algorithm}[H]
+\caption{ML-Based Loop Optimisation Decision}
+\label{alg:compiler}
+\begin{algorithmic}[1]
+
+\Require Loop kernel source $S$; trained model $f$; configurations $C$
+\Ensure Compiler flags for $S$
+
+\State $tokens \gets \textsc{Lex}(S)$
+\State $ast \gets \textsc{Parse}(tokens)$
+\State Check declarations, subscripts and loop bounds (semantic analysis)
+\State $nest \gets$ loop nest with the largest iteration space
+\State Evaluate trip counts, strides, dependence distance, reductions
+\State $tac \gets \textsc{LowerToTAC}(ast)$
+\State $\phi \gets$ feature vector from $nest$, $tac$ and the array declarations
+\State $c^{*} \gets f(\phi)$
+\State \Return \textsc{Flags}$(c^{*})$
+
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+\caption{Construction of the Training Set and Model}
+\label{alg:training}
+\begin{algorithmic}[1]
+
+\Require Kernel corpus $\mathcal{K}$; configurations $C$; tolerance $\tau$
+\Ensure Trained model $f$
+
+\For{each kernel $L\in\mathcal{K}$}
+    \State $\phi(L) \gets$ \textsc{ExtractFeatures}$(L)$
+    \For{each configuration $c\in C$}
+        \State compile $L$ with $c$
+    \EndFor
+    \For{round $=1$ \textbf{to} 5}
+        \For{each $c\in C$}
+            \State run the binary of $c$, record $T$ and the checksum
+        \EndFor
+    \EndFor
+    \State $T_c \gets$ minimum over the rounds
+    \State $y(L) \gets$ label by the rule above
+\EndFor
+\State Train $f$ on $\{(\phi(L),y(L))\}$ and evaluate with cross-validation
+\State \Return $f$
+
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Implementation}
+
+The software is organised as follows (all files are provided with this report):
+
+\begin{table}[H]
+\centering
+\caption{Source files of the implementation.}
+\label{tab:files}
+\small
+\begin{tabular}{ll}
+\toprule
+\textbf{File} & \textbf{Role}\\
+\midrule
+\texttt{lexer.py} & Phase 1: scanner\\
+\texttt{loop\_parser.py} & Phase 2: recursive-descent parser, AST\\
+\texttt{loop\_analyzer.py} & Phase 3: semantic and loop analysis, feature extraction\\
+\texttt{tac.py} & Phase 4: three-address-code generator\\
+\texttt{kernel\_gen.py} & Generator of the kernel corpus and timing harness\\
+\texttt{benchmark.py} & Compile/execute under all configurations\\
+\texttt{build\_dataset.py} & Features, timings, safety filter and labels\\
+\texttt{train\_model.py} & Training and evaluation of the models\\
+\texttt{predict.py} & Command-line advisor for a new loop\\
+\texttt{make\_report\_assets.py} & Generates the tables and plots of this report\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\newpage

@@ -1,0 +1,46 @@
+|--- n_stores <= 0.50
+|   |--- footprint_log2 <= 22.79
+|   |   |--- class: O3_fast_native
+|   |--- footprint_log2 >  22.79
+|   |   |--- class: O3_fast_native
+|--- n_stores >  0.50
+|   |--- n_unit_stride <= 2.50
+|   |   |--- tac_len <= 7.50
+|   |   |   |--- footprint_log2 <= 21.58
+|   |   |   |   |--- max_stride_log2 <= 6.79
+|   |   |   |   |   |--- class: O3_unroll_native
+|   |   |   |   |--- max_stride_log2 >  6.79
+|   |   |   |   |   |--- class: O2
+|   |   |   |--- footprint_log2 >  21.58
+|   |   |   |   |--- bytes_per_iter <= 12.00
+|   |   |   |   |   |--- class: O2
+|   |   |   |   |--- bytes_per_iter >  12.00
+|   |   |   |   |   |--- class: O2
+|   |   |--- tac_len >  7.50
+|   |   |   |--- dtype_bytes <= 6.00
+|   |   |   |   |--- total_iters_log2 <= 14.50
+|   |   |   |   |   |--- class: O3_fast_native
+|   |   |   |   |--- total_iters_log2 >  14.50
+|   |   |   |   |   |--- class: O3_fast_native
+|   |   |   |--- dtype_bytes >  6.00
+|   |   |   |   |--- n_loads <= 1.50
+|   |   |   |   |   |--- class: O3_native
+|   |   |   |   |--- n_loads >  1.50
+|   |   |   |   |   |--- class: O3_fast_native
+|   |--- n_unit_stride >  2.50
+|   |   |--- dep_distance <= 3.00
+|   |   |   |--- bytes_per_iter <= 28.00
+|   |   |   |   |--- bytes_per_iter <= 20.00
+|   |   |   |   |   |--- class: O3_native
+|   |   |   |   |--- bytes_per_iter >  20.00
+|   |   |   |   |   |--- class: O3_native
+|   |   |   |--- bytes_per_iter >  28.00
+|   |   |   |   |--- footprint_log2 <= 21.50
+|   |   |   |   |   |--- class: O3_native
+|   |   |   |   |--- footprint_log2 >  21.50
+|   |   |   |   |   |--- class: O2
+|   |   |--- dep_distance >  3.00
+|   |   |   |--- bytes_per_iter <= 18.00
+|   |   |   |   |--- class: O2
+|   |   |   |--- bytes_per_iter >  18.00
+|   |   |   |   |--- class: O3_native

@@ -1,0 +1,36 @@
+source file      : kernels/matmul_double_96_jki.c
+tokens           : 97
+loop nest        : depth 3, trip counts [96, 96, 96], vars ['j', 'k', 'i']
+memory strides   : {'C[i][j]': 96, 'A[i][k]': 96, 'B[k][j]': 0}
+feature vector   :
+    dtype_bytes        8.000
+    nest_depth         3.000
+    inner_trip_log2    6.585
+    total_iters_log2   19.755
+    n_add              1.000
+    n_mul              1.000
+    n_div              0.000
+    n_flops            2.000
+    n_loads            3.000
+    n_stores           1.000
+    n_arrays           3.000
+    n_branches         0.000
+    n_unit_stride      0.000
+    n_nonunit_stride   2.000
+    n_invariant        1.000
+    max_stride_log2    6.585
+    has_reduction      0.000
+    has_carried_dep    0.000
+    dep_distance       0.000
+    footprint_log2     17.755
+    bytes_per_iter     16.000
+    arith_intensity    0.125
+    tac_len            6.000
+
+model            : k-NN
+    P(O2_unroll4       ) = 1.00
+advised config   : O2_unroll4
+advised command  : gcc -O2 -funroll-loops --param max-unroll-times=4 -o kernel kernels/matmul_double_96_jki.c -lm
+
+-O2 baseline     :     467163.6 ns / call
+O2_unroll4       :     355592.7 ns / call   speed-up x1.31

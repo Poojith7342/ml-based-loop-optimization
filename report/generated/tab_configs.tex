@@ -1,0 +1,20 @@
+\begin{table}[H]
+\centering
+\caption{Decision space: the seven candidate optimisation configurations.}
+\label{tab:configs}
+\small
+
+\begin{tabular}{ll}
+\toprule
+\textbf{Class} & \textbf{GCC flags} \\
+\midrule
+\texttt{O2} & \texttt{-O2} \\
+\texttt{O3} & \texttt{-O3} \\
+\texttt{O2\_unroll4} & \texttt{-O2 -funroll-loops --param max-unroll-times=4} \\
+\texttt{O2\_unroll8} & \texttt{-O2 -funroll-loops --param max-unroll-times=8} \\
+\texttt{O3\_native} & \texttt{-O3 -march=native} \\
+\texttt{O3\_unroll\_native} & \texttt{-O3 -funroll-loops -march=native} \\
+\texttt{O3\_fast\_native} & \texttt{-O3 -march=native -ffast-math} \\
+\bottomrule
+\end{tabular}
+\end{table}

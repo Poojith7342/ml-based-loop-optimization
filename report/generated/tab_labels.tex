@@ -1,0 +1,21 @@
+\begin{table}[H]
+\centering
+\caption{Label distribution and performance of each \emph{static} configuration over all kernels (speed-up w.r.t.\ \texttt{O2}; a configuration that changes the numerical result is replaced by \texttt{O2}).}
+\label{tab:labels}
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lrrrrr}
+\toprule
+\textbf{Config} & \textbf{Label count} & \textbf{Label \%} & \textbf{GM speed-up} & \textbf{Within 5\% of best} & \textbf{Rejected} \\
+\midrule
+\texttt{O2} & 25 & 13.7 & 1.000 & 25 & 0 \\
+\texttt{O3} & 6 & 3.3 & 1.054 & 23 & 0 \\
+\texttt{O2\_unroll4} & 2 & 1.1 & 1.084 & 26 & 0 \\
+\texttt{O2\_unroll8} & 2 & 1.1 & 1.109 & 29 & 0 \\
+\texttt{O3\_native} & 65 & 35.7 & 1.512 & 92 & 0 \\
+\texttt{O3\_unroll\_native} & 37 & 20.3 & 1.560 & 114 & 0 \\
+\texttt{O3\_fast\_native} & 45 & 24.7 & 2.197 & 128 & 0 \\
+\textbf{Oracle} & -- & -- & \textbf{2.316} & -- & -- \\
+\bottomrule
+\end{tabular}}
+\end{table}

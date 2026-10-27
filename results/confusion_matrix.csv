@@ -1,0 +1,8 @@
+,O2,O3,O2_unroll4,O2_unroll8,O3_native,O3_unroll_native,O3_fast_native
+O2,10,0,0,1,8,4,2
+O3,1,2,0,0,2,1,0
+O2_unroll4,0,0,0,0,0,2,0
+O2_unroll8,1,0,0,0,1,0,0
+O3_native,2,1,0,1,45,13,3
+O3_unroll_native,5,0,1,0,6,22,3
+O3_fast_native,0,0,0,0,5,3,37

@@ -1,0 +1,22 @@
+\begin{table}[H]
+\centering
+\caption{Portable setting: only the four IEEE-safe, non-native configurations (\texttt{O2}, \texttt{O3}, \texttt{O2\_unroll4}, \texttt{O2\_unroll8}) are allowed.}
+\label{tab:portable}
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llrrrrr}
+\toprule
+\textbf{Model} & \textbf{Protocol} & \textbf{Acc.\ (\%)} & \textbf{GM speed-up} & \textbf{Oracle gain (\%)} & \textbf{Regret (\%)} & \textbf{Slow-downs} \\
+\midrule
+Always -O2 & -- & 46.2 & 1.000 & 0 & 21.2 & 0 \\
+Always -O3 & -- & 22.0 & 1.054 & 33 & 14.3 & 32 \\
+Decision Tree & 5-fold CV & 51.9 & 1.088 & 53 & 9.0 & 5 \\
+Decision Tree & LOFO & 37.4 & 1.012 & 7 & 19.6 & 8 \\
+Random Forest & 5-fold CV & 52.1 & 1.102 & 60 & 7.3 & 7 \\
+Random Forest & LOFO & 38.5 & 1.022 & 13 & 18.1 & 5 \\
+k-NN & 5-fold CV & 57.1 & 1.108 & 64 & 6.6 & 6 \\
+k-NN & LOFO & 43.4 & 1.039 & 23 & 15.8 & 3 \\
+\textbf{Oracle} & -- & -- & \textbf{1.175} & 100 & 0.0 & 0 \\
+\bottomrule
+\end{tabular}}
+\end{table}

@@ -1,0 +1,41 @@
+\section*{Abstract}
+
+High-performance computing programs spend most of their time in loop nests, and
+the speed of the generated code depends on optimisation choices such as
+vectorisation, unrolling and the use of the target instruction set. Production
+compilers make these choices with fixed, hand-written heuristics that cannot
+adapt to the individual loop. This report designs and evaluates an
+ML-based loop-optimisation decision model that sits in front of an unmodified
+GCC compiler.
+
+A compiler front end is implemented from scratch: a lexical analyser, a
+recursive-descent parser, a semantic and loop analyser, and a three-address-code
+generator. From the analysed loop nest the front end computes \numFeatures\
+static features, such as trip counts, exact memory strides, loop-carried
+dependence distance, reductions, arithmetic intensity and working-set size. A
+supervised model maps the features to one of \numConfigs\ GCC optimisation
+configurations. The model is trained on \numKernels\ C loop kernels from
+\numFamilies\ HPC-style families (vector updates, reductions, recurrences,
+1-D/2-D stencils, matrix multiplication, 2-D traversals, branchy and strided
+loops). Every kernel was compiled with every configuration (\numCompiles\
+compilations) and executed on the target machine, and the label is the best
+configuration that preserves the numerical result.
+
+The evaluation uses the speed-up of the generated code. With random 5-fold
+cross-validation the best model (\selModel) reaches a geometric-mean speed-up of
+\selGMCV$\times$ over \texttt{-O2}, which is \selFracCV\% of the gain of the oracle
+(\oracleGM$\times$). This must be compared honestly with static choices: always using
+\texttt{-O3} gives \gmOThree$\times$, always using \texttt{-O3 -march=native} gives
+\gmONative$\times$, and always using \texttt{-O3 -march=native -ffast-math} gives
+\gmOFast$\times$. On this machine the learned model is therefore only marginally better
+than the most aggressive static configuration in cross-validation, and on loop families
+never seen in training (leave-one-family-out) it is worse (\selGMLOFO$\times$), which shows the
+limits of a small corpus. The model is more useful when the binary must be portable and
+IEEE-safe: among the four non-native, non-fast-math configurations it reaches \pCV$\times$
+(oracle \pOracle$\times$) against \pOThree$\times$ for \texttt{-O3}, which causes \pOThreeSlow\
+slow-downs of more than 5\%. Feature extraction and prediction take about \featMs\ ms and
+\predMs\ ms per loop, small compared with a GCC compilation (\gccCompileMs\ ms).
+
+\textbf{Keywords:}
+Compiler Design, Loop Optimization, Lexical Analysis, Syntax Analysis,
+Dependence Analysis, Machine Learning, High-Performance Computing, GCC.

@@ -1,0 +1,22 @@
+\begin{table}[H]
+\centering
+\caption{Per-family geometric-mean speed-up over \texttt{O2} of the selected model (k-NN).}
+\label{tab:family}
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lrrrrrr}
+\toprule
+\textbf{Family} & \textbf{$n$} & \textbf{Oracle} & \textbf{Model (CV)} & \textbf{Model (LOFO)} & \textbf{Acc.\ CV (\%)} & \textbf{Acc.\ LOFO (\%)} \\
+\midrule
+\texttt{axpy} & 36 & 1.88 & 1.82 & 1.76 & 67 & 53 \\
+\texttt{cond} & 16 & 5.02 & 4.98 & 1.29 & 81 & 6 \\
+\texttt{dot} & 18 & 4.19 & 4.19 & 3.74 & 94 & 89 \\
+\texttt{matmul} & 24 & 2.83 & 2.76 & 1.46 & 75 & 4 \\
+\texttt{recur} & 24 & 1.38 & 1.26 & 1.27 & 54 & 42 \\
+\texttt{stencil1d} & 16 & 1.73 & 1.67 & 1.67 & 50 & 81 \\
+\texttt{stencil2d} & 8 & 2.26 & 2.23 & 2.21 & 25 & 75 \\
+\texttt{strided} & 20 & 1.24 & 1.07 & 1.16 & 25 & 30 \\
+\texttt{traverse2d} & 20 & 3.71 & 3.65 & 3.67 & 80 & 80 \\
+\bottomrule
+\end{tabular}}
+\end{table}
